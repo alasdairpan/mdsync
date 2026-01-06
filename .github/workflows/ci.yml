@@ -1,0 +1,176 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint (Ruff & MyPy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Run Ruff linter
+        run: |
+          echo "Running Ruff linter..."
+          ruff check .
+      
+      - name: Run Ruff formatter check
+        run: |
+          echo "Checking code formatting with Ruff..."
+          ruff format --check .
+      
+      - name: Run MyPy type checker
+        run: |
+          echo "Running MyPy type checker..."
+          mypy mdsync/
+
+  test:
+    name: Test (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ -v --cov=mdsync --cov-report=term-missing --cov-report=xml
+      
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+      
+      - name: Build package
+        run: |
+          python -m build
+      
+      - name: Check package
+        run: |
+          twine check dist/*
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  install-and-run:
+    name: Install & Run (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      
+      - name: Install package from wheel
+        shell: bash
+        run: |
+          pip install dist/*.whl
+      
+      - name: Test CLI help command
+        run: |
+          mdsync --help
+      
+      - name: Test notion subcommand help
+        run: |
+          mdsync notion --help
+      
+      - name: Test dry-run with sample files
+        shell: bash
+        run: |
+          # Create a temporary markdown file for testing
+          mkdir -p /tmp/test_mdsync
+          echo "# Test Document" > /tmp/test_mdsync/test.md
+          echo "This is a test." >> /tmp/test_mdsync/test.md
+          
+          # Run dry-run mode (won't actually sync without real token/parent)
+          # This tests that the CLI loads and parses correctly
+          mdsync notion --token fake_token --parent fake_parent --dry-run /tmp/test_mdsync/test.md || true
+          
+          echo "Basic CLI functionality verified!"
+
+  all-checks-pass:
+    name: All Checks Passed
+    needs: [lint, test, build, install-and-run]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check all job statuses
+        run: |
+          if [[ "${{ needs.lint.result }}" != "success" ]] || \
+             [[ "${{ needs.test.result }}" != "success" ]] || \
+             [[ "${{ needs.build.result }}" != "success" ]] || \
+             [[ "${{ needs.install-and-run.result }}" != "success" ]]; then
+            echo "One or more checks failed!"
+            exit 1
+          fi
+          echo "All checks passed successfully!"

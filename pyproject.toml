@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mdsync"
-version = "0.1.0"
+version = "0.0.1"
 description = "A Python CLI package to sync markdown files to Notion and other platforms"
 readme = "README.md"
 requires-python = ">=3.9"
