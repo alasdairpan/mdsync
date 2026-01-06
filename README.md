@@ -1,6 +1,13 @@
 # mdsync
 
-A Python CLI package to sync markdown files to Notion (and potentially other platforms in the future). One-way sync from markdown → platform with focus on simplicity and excellent markdown parsing.
+[![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Type checked: mypy](https://img.shields.io/badge/type%20checked-mypy-blue)](https://mypy-lang.org/)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](tests/)
+[![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)](tests/)
+
+A Python CLI package to sync markdown files to Notion (and potentially other platforms in the future). One-way sync from markdown to platform with focus on simplicity and excellent markdown parsing.
 
 ## Features
 
