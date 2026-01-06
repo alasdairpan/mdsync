@@ -691,6 +691,9 @@ def _map_language(language: str) -> str:
         "md": "markdown",
         "tex": "latex",
         "wasm": "webassembly",
+        # Mermaid variants
+        "mermaid": "mermaid",
+        "mmd": "mermaid",
     }
 
     normalized = language.lower().strip()
