@@ -1,0 +1,25 @@
+{
+    "default": true,
+    "line-length": false,
+    "no-inline-html": {
+        "allowed_elements": [
+            "br",
+            "antml:function_calls",
+            "antml:invoke",
+            "antml:parameter",
+            "preserve",
+            "example",
+            "examples",
+            "communicationExamples",
+            "fileLinkification",
+            "advanced-blocks"
+        ]
+    },
+    "no-duplicate-heading": {
+        "siblings_only": true
+    },
+    "fenced-code-language": false,
+    "no-bare-urls": false,
+    "first-line-heading": false,
+    "heading-increment": false
+}
