@@ -23,12 +23,14 @@ class ParseResult:
         blocks: List of Notion block dictionaries
         blocks_with_links: List of (block_index, relative_link_path) tuples for blocks containing relative links
     """
+
     blocks: list[dict[str, Any]]
     blocks_with_links: list[tuple[int, str]]  # (block_index, relative_link_path)
 
 
 class _BlockLinkTracker:
     """Helper class to track relative links in a block."""
+
     def __init__(self) -> None:
         self.relative_links: list[str] = []  # List of relative link paths
 
@@ -189,9 +191,7 @@ def _transform_paragraph(
         }
 
     # Normal paragraph with inline content
-    rich_text = _transform_inline_formatting(
-        children_list, file_path, page_map, link_tracker
-    )
+    rich_text = _transform_inline_formatting(children_list, file_path, page_map, link_tracker)
 
     return {
         "type": "paragraph",
@@ -267,9 +267,7 @@ def _transform_list(
                             children_blocks.extend(nested_blocks)
                         else:
                             # Handle other nested blocks (code, quotes, etc.)
-                            transformed = _transform_block(
-                                child, file_path, page_map, link_tracker
-                            )
+                            transformed = _transform_block(child, file_path, page_map, link_tracker)
                             if isinstance(transformed, list):
                                 children_blocks.extend(transformed)
                             elif transformed is not None:
@@ -354,9 +352,7 @@ def _transform_table(
                 cells: list[list[dict[str, Any]]] = []
                 for cell in row.children:
                     cell_children = (
-                        list(cell.children)
-                        if hasattr(cell, "children") and cell.children
-                        else []
+                        list(cell.children) if hasattr(cell, "children") and cell.children else []
                     )
                     cell_content = _transform_inline_formatting(
                         cell_children, file_path, page_map, link_tracker
@@ -588,17 +584,78 @@ def _map_language(language: str) -> str:
     """
     # Notion supported languages (as of API version 2025-09-03)
     notion_languages = {
-        "abap", "arduino", "bash", "basic", "c", "clojure", "coffeescript",
-        "c++", "c#", "css", "dart", "diff", "docker", "elixir", "elm",
-        "erlang", "flow", "fortran", "f#", "gherkin", "glsl", "go", "graphql",
-        "groovy", "haskell", "html", "java", "javascript", "json", "julia",
-        "kotlin", "latex", "less", "lisp", "livescript", "lua", "makefile",
-        "markdown", "markup", "matlab", "mermaid", "nix", "objective-c",
-        "ocaml", "pascal", "perl", "php", "plain text", "powershell", "prolog",
-        "protobuf", "python", "r", "reason", "ruby", "rust", "sass", "scala",
-        "scheme", "scss", "shell", "sql", "swift", "typescript", "vb.net",
-        "verilog", "vhdl", "visual basic", "webassembly", "xml", "yaml",
-        "java/c/c++/c#"
+        "abap",
+        "arduino",
+        "bash",
+        "basic",
+        "c",
+        "clojure",
+        "coffeescript",
+        "c++",
+        "c#",
+        "css",
+        "dart",
+        "diff",
+        "docker",
+        "elixir",
+        "elm",
+        "erlang",
+        "flow",
+        "fortran",
+        "f#",
+        "gherkin",
+        "glsl",
+        "go",
+        "graphql",
+        "groovy",
+        "haskell",
+        "html",
+        "java",
+        "javascript",
+        "json",
+        "julia",
+        "kotlin",
+        "latex",
+        "less",
+        "lisp",
+        "livescript",
+        "lua",
+        "makefile",
+        "markdown",
+        "markup",
+        "matlab",
+        "mermaid",
+        "nix",
+        "objective-c",
+        "ocaml",
+        "pascal",
+        "perl",
+        "php",
+        "plain text",
+        "powershell",
+        "prolog",
+        "protobuf",
+        "python",
+        "r",
+        "reason",
+        "ruby",
+        "rust",
+        "sass",
+        "scala",
+        "scheme",
+        "scss",
+        "shell",
+        "sql",
+        "swift",
+        "typescript",
+        "vb.net",
+        "verilog",
+        "vhdl",
+        "visual basic",
+        "webassembly",
+        "xml",
+        "yaml",
+        "java/c/c++/c#",
     }
 
     # Common markdown -> Notion language mappings

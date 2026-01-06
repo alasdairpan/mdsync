@@ -96,9 +96,7 @@ class NotionPlatform(Platform):
 
         return self._get_page_url(page_id), page_id, block_ids
 
-    def _extract_title(
-        self, file_path: Path, blocks: list[dict[str, Any]]
-    ) -> tuple[str, bool]:
+    def _extract_title(self, file_path: Path, blocks: list[dict[str, Any]]) -> tuple[str, bool]:
         """Extract page title based on page_title mode.
 
         Args:
@@ -275,9 +273,7 @@ class NotionPlatform(Platform):
             elapsed = time.time() - self._last_request_time
             if elapsed < RATE_LIMIT_DELAY:
                 sleep_time = RATE_LIMIT_DELAY - elapsed
-                self.console.print(
-                    f"[dim]⏱ Rate limiting: waiting {sleep_time:.2f}s[/dim]"
-                )
+                self.console.print(f"[dim]⏱ Rate limiting: waiting {sleep_time:.2f}s[/dim]")
                 time.sleep(sleep_time)
 
             self._last_request_time = time.time()
@@ -323,7 +319,9 @@ class NotionPlatform(Platform):
                 raise
 
         # This should never be reached as the loop should always return or raise
-        raise RuntimeError(f"Request failed after {max_retries} retries without raising an exception")
+        raise RuntimeError(
+            f"Request failed after {max_retries} retries without raising an exception"
+        )
 
     def _validate_blocks(self, blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Validate and sanitize blocks to meet Notion API limits.

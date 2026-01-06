@@ -17,7 +17,7 @@ def discover_markdown_files(path: Path) -> list[Path]:
         List of markdown file paths, sorted alphabetically
     """
     if path.is_file():
-        if path.suffix.lower() in ['.md', '.markdown']:
+        if path.suffix.lower() in [".md", ".markdown"]:
             return [path]
         else:
             return []

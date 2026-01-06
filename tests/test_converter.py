@@ -23,7 +23,10 @@ class TestParseMarkdown:
         assert isinstance(result, ParseResult)
         assert len(result.blocks) == 1
         assert result.blocks[0]["type"] == "paragraph"
-        assert result.blocks[0]["paragraph"]["rich_text"][0]["text"]["content"] == "This is a simple paragraph."
+        assert (
+            result.blocks[0]["paragraph"]["rich_text"][0]["text"]["content"]
+            == "This is a simple paragraph."
+        )
 
     def test_parse_heading_level_1(self, tmp_path: Path) -> None:
         """Test parsing heading level 1."""

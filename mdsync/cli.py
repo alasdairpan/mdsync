@@ -126,9 +126,7 @@ def notion(
                 console.print(f"[cyan]📄 {md_file.relative_to(base_path)}[/cyan]")
                 try:
                     parse_result = parse_markdown(md_file)
-                    console.print(
-                        f"  [dim]→ {len(parse_result.blocks)} Notion block(s)[/dim]"
-                    )
+                    console.print(f"  [dim]→ {len(parse_result.blocks)} Notion block(s)[/dim]")
                 except Exception as e:
                     console.print(f"  [red]✗ Error: {e}[/red]")
 
@@ -137,18 +135,16 @@ def notion(
 
             console.print("\n[yellow]No changes made (dry run)[/yellow]")
         else:
-            console.print(
-                f"[green]🚀 Syncing to Notion (Parent: {parent})...[/green]\n"
-            )
+            console.print(f"[green]🚀 Syncing to Notion (Parent: {parent})...[/green]\n")
 
             # Build directory structure map: directory path -> parent page ID
             dir_to_parent: dict[Path, str] = {base_path: parent}
 
             # Track file->page mappings and blocks with links for second pass
             file_to_page_id: dict[Path, str] = {}  # absolute file path -> page ID
-            blocks_to_update: list[tuple[str, dict[str, Any], Path, str, int]] = (
-                []
-            )  # (block_id, block_content, source_file, relative_link, block_idx)
+            blocks_to_update: list[
+                tuple[str, dict[str, Any], Path, str, int]
+            ] = []  # (block_id, block_content, source_file, relative_link, block_idx)
 
             # TWO-PASS SYNC
             # Pass 1: Create all pages and collect block IDs for those with relative links
@@ -161,7 +157,6 @@ def notion(
                 TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
                 console=console,
             ) as progress:
-
                 # Initialize Notion platform
                 notion_platform = NotionPlatform(
                     token,
@@ -178,9 +173,7 @@ def notion(
                 for md_file in md_files:
                     # Update progress with current file
                     relative_path = md_file.relative_to(base_path)
-                    progress.update(
-                        task, description=f"Creating [cyan]{relative_path}[/cyan]"
-                    )
+                    progress.update(task, description=f"Creating [cyan]{relative_path}[/cyan]")
 
                     try:
                         # Ensure parent containers exist for this file's directory
@@ -213,9 +206,7 @@ def notion(
                                 md_file, parse_result.blocks
                             )
                             actual_idx = (
-                                block_idx - 1
-                                if skip_first and block_idx > 0
-                                else block_idx
+                                block_idx - 1 if skip_first and block_idx > 0 else block_idx
                             )
 
                             if 0 <= actual_idx < len(block_ids):
@@ -292,12 +283,8 @@ def notion(
 
                                 # Get the resolved block at the same index
                                 if block_idx < len(parse_result_resolved.blocks):
-                                    updated_block_content = (
-                                        parse_result_resolved.blocks[block_idx]
-                                    )
-                                    notion_platform.update_block(
-                                        block_id, updated_block_content
-                                    )
+                                    updated_block_content = parse_result_resolved.blocks[block_idx]
+                                    notion_platform.update_block(block_id, updated_block_content)
 
                         except Exception as e:
                             progress.console.print(
@@ -333,13 +320,9 @@ def notion(
             # Success message
             success_count = sum(1 for r in results if r["status"] == "✓")
             if success_count == len(results):
-                console.print(
-                    f"\n[green]✓ Successfully synced {success_count} file(s)[/green]"
-                )
+                console.print(f"\n[green]✓ Successfully synced {success_count} file(s)[/green]")
             else:
-                console.print(
-                    f"\n[yellow]⚠ Synced {success_count}/{len(results)} file(s)[/yellow]"
-                )
+                console.print(f"\n[yellow]⚠ Synced {success_count}/{len(results)} file(s)[/yellow]")
 
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
