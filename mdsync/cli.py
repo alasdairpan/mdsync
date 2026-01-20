@@ -14,6 +14,7 @@ from rich.table import Table
 from rich.traceback import install as install_rich_traceback
 from rich.tree import Tree
 
+from . import __version__
 from .converter import parse_markdown
 from .discovery import build_file_tree, discover_markdown_files
 from .platforms.notion import NotionPlatform
@@ -24,13 +25,24 @@ install_rich_traceback()
 console = Console()
 
 
-@click.group()
-def main() -> None:
+@click.group(invoke_without_command=True)
+@click.option(
+    "-v",
+    "--version",
+    is_flag=True,
+    help="Show version and exit",
+)
+@click.pass_context
+def main(ctx: click.Context, version: bool) -> None:
     """Sync markdown files to various platforms.
 
     Use platform-specific subcommands (e.g., 'notion') to sync to different platforms.
     """
-    pass
+    if version:
+        click.echo(__version__)
+        ctx.exit(0)
+    elif ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
 
 
 @main.command()
