@@ -102,6 +102,7 @@ Options:
 - Tables with header detection
 - Dividers/Horizontal rules
 - LaTeX equations (`$...$` inline, `$$...$$` block)
+  - **Note**: Dollar signs are treated as math delimiters. To use `$` for currency, escape it: `\$4000`
 - Line breaks
 
 ## How It Works
