@@ -149,6 +149,30 @@ class TestParseMarkdown:
         assert result.blocks[0]["code"]["language"] == "python"
         assert "print('hello')" in result.blocks[0]["code"]["rich_text"][0]["text"]["content"]
 
+    def test_parse_solidity_code_block(self, tmp_path: Path) -> None:
+        """Test parsing a Solidity code block."""
+        md_file = tmp_path / "test.md"
+        md_file.write_text("```solidity\npragma solidity ^0.8.20;\n```")
+
+        result = parse_markdown(md_file)
+
+        assert len(result.blocks) == 1
+        assert result.blocks[0]["type"] == "code"
+        assert result.blocks[0]["code"]["language"] == "solidity"
+        assert "pragma solidity" in result.blocks[0]["code"]["rich_text"][0]["text"]["content"]
+
+    def test_parse_solidity_code_block_with_sol_alias(self, tmp_path: Path) -> None:
+        """Test parsing a Solidity code block using 'sol' alias."""
+        md_file = tmp_path / "test.md"
+        md_file.write_text("```sol\ncontract Governor {}\n```")
+
+        result = parse_markdown(md_file)
+
+        assert len(result.blocks) == 1
+        assert result.blocks[0]["type"] == "code"
+        assert result.blocks[0]["code"]["language"] == "solidity"
+        assert "contract Governor" in result.blocks[0]["code"]["rich_text"][0]["text"]["content"]
+
     def test_parse_bulleted_list(self, tmp_path: Path) -> None:
         """Test parsing a bulleted list."""
         md_file = tmp_path / "test.md"

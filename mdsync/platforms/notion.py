@@ -393,6 +393,14 @@ class NotionPlatform(Platform):
                 text_obj = item.get("text", {})
                 content = text_obj.get("content", "")
 
+                # Fix invalid relative URLs by setting them to null
+                link = text_obj.get("link")
+                if link and isinstance(link, dict):
+                    url = link.get("url")
+                    if url and not url.startswith(("http://", "https://", "#", "mailto:", "//")):
+                        # Unresolved relative link - set to None to avoid Notion API error
+                        text_obj["link"] = None
+
                 # Split if exceeds limit
                 if len(content) > MAX_RICH_TEXT_LENGTH:
                     # Split content into chunks of MAX_RICH_TEXT_LENGTH

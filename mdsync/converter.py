@@ -645,6 +645,7 @@ def _map_language(language: str) -> str:
         "scheme",
         "scss",
         "shell",
+        "solidity",
         "sql",
         "swift",
         "typescript",
@@ -691,6 +692,8 @@ def _map_language(language: str) -> str:
         "md": "markdown",
         "tex": "latex",
         "wasm": "webassembly",
+        # Solidity variants
+        "sol": "solidity",
         # Mermaid variants
         "mermaid": "mermaid",
         "mmd": "mermaid",
