@@ -16,7 +16,7 @@ from ..constants import SAFE_EMOJIS
 from .base import Platform
 
 # Notion API limits
-MAX_RICH_TEXT_LENGTH = 2000
+MAX_RICH_TEXT_LENGTH = 1600  # Notion API limit is 2000, using 1600 for safety margin
 MAX_BLOCKS_PER_REQUEST = 100
 RATE_LIMIT_DELAY = 0.35  # ~3 requests per second (1/3 = 0.33, add buffer)
 
@@ -229,7 +229,7 @@ class NotionPlatform(Platform):
         num_chunks = (len(validated_blocks) + chunk_size - 1) // chunk_size
         if num_chunks > 1:
             self.console.print(
-                f"[yellow]⚠ Appending {len(validated_blocks)} blocks in {num_chunks} chunks[/yellow]"
+                f"[green]⚠ Appending {len(validated_blocks)} blocks in {num_chunks} chunks[/green]"
             )
 
         all_block_ids: list[str] = []
@@ -411,7 +411,7 @@ class NotionPlatform(Platform):
 
                     if self.console:
                         self.console.print(
-                            f"[yellow]⚠ Content exceeds {MAX_RICH_TEXT_LENGTH} chars ({len(content)}), splitting into {len(chunks)} parts[/yellow]"
+                            f"[green]⚠ Content exceeds {MAX_RICH_TEXT_LENGTH} chars ({len(content)}), splitting into {len(chunks)} parts[/green]"
                         )
 
                     # Create a separate rich_text object for each chunk
