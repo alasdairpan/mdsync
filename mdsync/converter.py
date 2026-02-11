@@ -697,6 +697,13 @@ def _map_language(language: str) -> str:
         # Mermaid variants
         "mermaid": "mermaid",
         "mmd": "mermaid",
+        # JSX / TSX and React variants (Notion doesn't support JSX/TSX directly)
+        # Map them to the closest supported Notion language
+        "jsx": "javascript",
+        "javascriptreact": "javascript",
+        "tsx": "typescript",
+        "typescriptreact": "typescript",
+        "react": "javascript",
     }
 
     normalized = language.lower().strip()
