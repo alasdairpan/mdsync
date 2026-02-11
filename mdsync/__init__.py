@@ -4,4 +4,4 @@ This package provides a command-line interface for one-way synchronization of ma
 files to various platforms like Notion, with focus on simplicity and excellent markdown parsing.
 """
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
