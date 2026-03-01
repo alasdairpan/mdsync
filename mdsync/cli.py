@@ -360,13 +360,13 @@ def _extract_page_id_from_link(link_or_page_id: str) -> str:
     s = link_or_page_id.strip()
     # Find either hyphenated UUID or 32-hex contiguous string
     m = re.search(
-        r'([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})|([0-9a-fA-F]{32})',
+        r"([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})|([0-9a-fA-F]{32})",
         s,
     )
     if not m:
         raise ValueError(f"Could not find a Notion page ID in '{link_or_page_id}'")
     raw = m.group(1) or m.group(2)
-    page_id = raw.replace('-', '').lower()
+    page_id = raw.replace("-", "").lower()
     if len(page_id) != 32 or not all(c in "0123456789abcdef" for c in page_id):
         raise ValueError(
             f"Extracted page ID '{page_id}' is not a valid 32-character hexadecimal string."
