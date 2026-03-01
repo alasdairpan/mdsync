@@ -5,6 +5,7 @@ Handles argument parsing, file discovery, and orchestrates converter + platform 
 """
 
 import re
+from importlib import metadata
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +16,6 @@ from rich.table import Table
 from rich.traceback import install as install_rich_traceback
 from rich.tree import Tree
 
-from . import __version__
 from .converter import parse_markdown
 from .discovery import build_file_tree, discover_markdown_files
 from .platforms.notion import NotionPlatform
@@ -24,6 +24,52 @@ from .platforms.notion import NotionPlatform
 install_rich_traceback()
 
 console = Console()
+
+
+def _read_version_from_pyproject() -> str | None:
+    """Best-effort version lookup from a source checkout.
+
+    Wheels typically don't include `pyproject.toml`, so the normal/"published" way is
+    `importlib.metadata.version()`. This fallback is only for running from a repo
+    checkout without installing the package.
+    """
+
+    pyproject_path = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    if not pyproject_path.exists():
+        return None
+
+    try:
+        text = pyproject_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    in_project_section = False
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+
+        if line.startswith("[") and line.endswith("]"):
+            in_project_section = line == "[project]"
+            continue
+
+        if not in_project_section:
+            continue
+
+        m = re.match(r"^version\s*=\s*(['\"])(?P<v>[^'\"]+)\1\s*$", line)
+        if m:
+            return m.group("v")
+
+    return None
+
+
+def _get_cli_version() -> str:
+    """Return the version string shown by `mdsync --version`."""
+
+    try:
+        return metadata.version("mdsync")
+    except metadata.PackageNotFoundError:
+        return _read_version_from_pyproject() or "0.0.0"
 
 
 @click.group(invoke_without_command=True)
@@ -40,7 +86,7 @@ def main(ctx: click.Context, version: bool) -> None:
     Use platform-specific subcommands (e.g., 'notion') to sync to different platforms.
     """
     if version:
-        click.echo(__version__)
+        click.echo(_get_cli_version())
         ctx.exit(0)
     elif ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
