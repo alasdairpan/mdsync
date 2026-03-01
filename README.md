@@ -32,55 +32,49 @@ pip install mdsync
 1. Create a Notion integration at https://www.notion.so/my-integrations
 2. Copy the integration token (starts with `ntn_`)
 3. Share a Notion page with your integration
-4. Copy the page ID from the URL (the last part after the page name)
+4. Copy the page ID or page URL from the Notion page
 
 ### Usage
 
 Sync a single markdown file:
 
 ```bash
-mdsync notion --token ntn_... --parent PAGE_ID document.md
+mdsync notion --token ntn_... --parent PAGE_ID_or_PAGE_URL document.md
 ```
 
 Sync an entire directory (preserves folder structure):
 
 ```bash
-mdsync notion --token ntn_... --parent PAGE_ID docs/
+mdsync notion --token ntn_... --parent PAGE_ID_or_PAGE_URL docs/
 ```
 
 Preview changes without syncing (dry-run):
 
 ```bash
-mdsync notion --token ntn_... --parent PAGE_ID --dry-run docs/
+mdsync notion --token ntn_... --parent PAGE_ID_or_PAGE_URL --dry-run docs/
 ```
 
 ## Command-Line Options
 
-```
-Usage: mdsync [OPTIONS] COMMAND [ARGS]...
-
-  Sync markdown files to various platforms.
-
-  Use platform-specific subcommands (e.g., 'notion') to sync to different
-  platforms.
-
-Commands:
-  notion  Sync markdown files to Notion
-
+```text
 Usage: mdsync notion [OPTIONS] PATH
 
   Sync markdown files to Notion.
 
-  PATH can be a single markdown file or a directory containing markdown
-  files. Directories are synced recursively, preserving the folder structure.
+  PATH can be a single markdown file or a directory containing markdown files.
+  Directories are synced recursively, preserving the folder structure.
 
 Options:
-  --token TEXT       Notion integration token  [required]
-  --parent TEXT      Parent page ID where files will be synced  [required]
-  --dry-run          Preview changes without actually syncing
-  --page-icon        Add random emoji icons to pages
-  --page-title TEXT  How to determine page titles: 'heading' (from first heading) or 'filename' (from file/folder name)  [default: filename]
-  --help             Show this message and exit.
+  --token TEXT                    Notion integration token  [required]
+  --parent TEXT                   Parent page ID or page URL where files will
+                                  be synced  [required]
+  --dry-run                       Preview changes without actually syncing
+  --page-icon                     Add random emoji icons to pages
+  --page-title [heading|filename]
+                                  How to determine page titles: 'heading'
+                                  (from first heading) or 'filename' (from
+                                  file/folder name)
+  --help                          Show this message and exit.
 ```
 
 ## Supported Markdown Features

@@ -4,6 +4,7 @@ This module defines the Click command-line interface with Rich output formatting
 Handles argument parsing, file discovery, and orchestrates converter + platform sync.
 """
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -54,7 +55,7 @@ def main(ctx: click.Context, version: bool) -> None:
 @click.option(
     "--parent",
     required=True,
-    help="Parent page ID where files will be synced",
+    help="Parent page ID or page URL where files will be synced",
 )
 @click.option(
     "--dry-run",
@@ -93,17 +94,18 @@ def notion(
 
     \b
     # Sync single file
-    mdsync notion --token <notion_token> --parent <page_id> document.md
+    mdsync notion --token <notion_token> --parent <page_id_or_page_url> document.md
 
     \b
     # Sync directory (preserves structure)
-    mdsync notion --token <notion_token> --parent <page_id> docs/
+    mdsync notion --token <notion_token> --parent <page_id_or_page_url> docs/
 
     \b
     # Dry-run preview
-    mdsync notion --token <notion_token> --parent <page_id> --dry-run docs/
+    mdsync notion --token <notion_token> --parent <page_id_or_page_url> --dry-run docs/
     """
     try:
+        parent = _extract_page_id_from_link(parent)
         # File discovery
         console.print(f"\n[cyan]📄 Loading markdown file(s): {path.resolve()}[/cyan]\n")
 
@@ -341,6 +343,35 @@ def notion(
         raise
 
     console.print()
+
+
+def _extract_page_id_from_link(link_or_page_id: str) -> str:
+    """Extract Notion page ID from a given link or return the page ID if already provided.
+    E.g.:
+    - Input: "https://www.notion.so/username/Page-Name-1429989f...?source=copy_link"
+      Output: "1429989f..."
+
+    Args:
+        link_or_page_id: The Notion page URL or page ID
+    Returns:
+        The extracted page ID
+
+    """
+    s = link_or_page_id.strip()
+    # Find either hyphenated UUID or 32-hex contiguous string
+    m = re.search(
+        r'([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})|([0-9a-fA-F]{32})',
+        s,
+    )
+    if not m:
+        raise ValueError(f"Could not find a Notion page ID in '{link_or_page_id}'")
+    raw = m.group(1) or m.group(2)
+    page_id = raw.replace('-', '').lower()
+    if len(page_id) != 32 or not all(c in "0123456789abcdef" for c in page_id):
+        raise ValueError(
+            f"Extracted page ID '{page_id}' is not a valid 32-character hexadecimal string."
+        )
+    return page_id
 
 
 def _add_tree_nodes(tree: Tree, structure: dict, base_path: Path) -> None:
