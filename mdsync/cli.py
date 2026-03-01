@@ -7,7 +7,7 @@ Handles argument parsing, file discovery, and orchestrates converter + platform 
 import re
 from importlib import metadata
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import click
 from rich.console import Console
@@ -26,7 +26,7 @@ install_rich_traceback()
 console = Console()
 
 
-def _read_version_from_pyproject() -> str | None:
+def _read_version_from_pyproject() -> Optional[str]:
     """Best-effort version lookup from a source checkout.
 
     Wheels typically don't include `pyproject.toml`, so the normal/"published" way is
