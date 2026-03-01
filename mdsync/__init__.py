@@ -3,5 +3,3 @@
 This package provides a command-line interface for one-way synchronization of markdown
 files to various platforms like Notion, with focus on simplicity and excellent markdown parsing.
 """
-
-__version__ = "0.1.3"
